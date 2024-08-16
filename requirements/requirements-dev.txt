@@ -1,0 +1,4 @@
+-r requirements.txt
+
+pre-commit<2.22
+ruff<0.6

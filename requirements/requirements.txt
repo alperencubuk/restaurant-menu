@@ -1,0 +1,10 @@
+django<5.2
+djangorestframework<3.16
+djangorestframework-simplejwt<5.4
+django-filter<25
+django-phonenumber-field[phonenumbers]<9
+drf-spectacular<0.28
+psycopg[binary]<3.3
+qrcode[pil]<7.5
+shortuuid<1.1
+whitenoise<7

@@ -1,0 +1,26 @@
+services:
+
+  django:
+    container_name: django
+    build:
+      context: .
+      dockerfile: ./config/dockerfile
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./config/.env
+    volumes:
+      - ./apps:/app/apps
+      - ./config:/app/config
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./config/.env
