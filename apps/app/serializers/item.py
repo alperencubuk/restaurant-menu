@@ -19,5 +19,5 @@ class ItemSerializer(ModelSerializer):
 
     @staticmethod
     def get_variations(obj) -> VariationSerializer:
-        active_variations = obj.moderators.filter(is_active=True)
+        active_variations = obj.variations.filter(is_active=True)
         return VariationSerializer(active_variations, many=True).data
