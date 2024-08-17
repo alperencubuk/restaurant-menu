@@ -15,18 +15,18 @@ class BaseModelViewSet(ModelViewSet):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.filterset_fields = {}
-        excluded_fields = {"image", "qr_code"}
+        filter_exclude = {"image", "qr_code"}
 
         model_meta = self.get_queryset().model._meta
 
         for field in model_meta.get_fields():
-            if field.name in excluded_fields:
+            if field.name in filter_exclude:
                 continue
 
             if field.get_internal_type() == "ForeignKey":
                 related_model_meta = field.related_model._meta
                 for related_field in related_model_meta.get_fields():
-                    if related_field.name not in excluded_fields:
+                    if related_field.name not in filter_exclude:
                         self.filterset_fields[f"{field.name}__{related_field.name}"] = (
                             self.get_lookup(related_field.get_internal_type())
                         )

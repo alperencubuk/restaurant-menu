@@ -19,12 +19,18 @@ class UserViewSet(ModelViewSet):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        filter_exclude = ("password",)
-        self.filterset_fields = [
-            field.name
-            for field in self.get_queryset().model._meta.get_fields()
-            if field.name not in filter_exclude
-        ]
+        self.filterset_fields = {}
+        filter_exclude = {"password"}
+
+        model_meta = self.get_queryset().model._meta
+
+        for field in model_meta.get_fields():
+            if field.name in filter_exclude:
+                continue
+
+            self.filterset_fields[field.name] = self.get_lookup(
+                field.get_internal_type()
+            )
 
     @extend_schema(tags=["me"])
     @action(detail=False, methods=["get", "patch", "delete"])
@@ -56,3 +62,26 @@ class UserViewSet(ModelViewSet):
         user.is_active = False
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @staticmethod
+    def get_lookup(field_type):
+        if field_type in ("CharField", "TextField"):
+            return [
+                "exact",
+                "iexact",
+                "contains",
+                "icontains",
+                "startswith",
+                "istartswith",
+                "endswith",
+                "iendswith",
+            ]
+        if field_type in (
+            "IntegerField",
+            "FloatField",
+            "DecimalField",
+            "DateTimeField",
+            "BigAutoField",
+        ):
+            return ["exact", "lt", "lte", "gt", "gte"]
+        return ["exact"]
