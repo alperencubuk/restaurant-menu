@@ -7,5 +7,5 @@ from apps.app.views.base import BaseModelViewSet
 
 @extend_schema(tags=["section"])
 class SectionViewSet(BaseModelViewSet):
-    queryset = Section.objects.all()
+    queryset = Section.objects.all().prefetch_related("items")
     serializer_class = SectionSerializer

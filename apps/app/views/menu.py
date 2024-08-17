@@ -7,9 +7,5 @@ from apps.app.views.base import BaseModelViewSet
 
 @extend_schema(tags=["menu"])
 class MenuViewSet(BaseModelViewSet):
-    queryset = Menu.objects.all()
+    queryset = Menu.objects.all().prefetch_related("categories")
     serializer_class = MenuSerializer
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.filterset_fields.pop("qr_code")

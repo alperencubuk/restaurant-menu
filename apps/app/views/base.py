@@ -15,12 +15,25 @@ class BaseModelViewSet(ModelViewSet):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.filterset_fields = {}
-        for field in self.get_queryset().model._meta.get_fields():
-            if not field.get_internal_type() == "ForeignKey":
+        excluded_fields = {"image", "qr_code"}
+
+        model_meta = self.get_queryset().model._meta
+
+        for field in model_meta.get_fields():
+            if field.name in excluded_fields:
+                continue
+
+            if field.get_internal_type() == "ForeignKey":
+                related_model_meta = field.related_model._meta
+                for related_field in related_model_meta.get_fields():
+                    if related_field.name not in excluded_fields:
+                        self.filterset_fields[f"{field.name}__{related_field.name}"] = (
+                            self.get_lookup(related_field.get_internal_type())
+                        )
+            else:
                 self.filterset_fields[field.name] = self.get_lookup(
                     field.get_internal_type()
                 )
-        self.filterset_fields.pop("image")
 
     def get_serializer(self, *args, **kwargs):
         if self.action == "reorder":

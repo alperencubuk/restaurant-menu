@@ -5,6 +5,7 @@ from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
 from apps.app.models.restaurant import Restaurant
+from apps.app.serializers.simple import SimpleMenuSerializer
 from apps.auth.serializers.simple import SimpleUserSerializer
 
 
@@ -18,6 +19,7 @@ class RestaurantSerializer(ModelSerializer):
         required=False,
         source="moderators",
     )
+    menus = SerializerMethodField(read_only=True)
 
     class Meta:
         model = Restaurant
@@ -27,3 +29,8 @@ class RestaurantSerializer(ModelSerializer):
     def get_moderators(obj) -> SimpleUserSerializer:
         active_moderators = obj.moderators.filter(is_active=True)
         return SimpleUserSerializer(active_moderators, many=True).data
+
+    @staticmethod
+    def get_menus(obj) -> SimpleMenuSerializer:
+        active_menus = obj.menus.filter(is_active=True)
+        return SimpleMenuSerializer(active_menus, many=True).data

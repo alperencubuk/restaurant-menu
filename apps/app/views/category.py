@@ -7,5 +7,5 @@ from apps.app.views.base import BaseModelViewSet
 
 @extend_schema(tags=["category"])
 class CategoryViewSet(BaseModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().prefetch_related("sections")
     serializer_class = CategorySerializer

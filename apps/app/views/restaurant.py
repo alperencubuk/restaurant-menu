@@ -8,7 +8,7 @@ from apps.app.views.base import BaseModelViewSet
 
 @extend_schema(tags=["restaurant"])
 class RestaurantViewSet(BaseModelViewSet):
-    queryset = Restaurant.objects.all().prefetch_related("moderators")
+    queryset = Restaurant.objects.all().prefetch_related("moderators", "menus")
     serializer_class = RestaurantSerializer
 
     def get_permissions(self):
