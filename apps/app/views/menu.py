@@ -12,4 +12,4 @@ class MenuViewSet(BaseModelViewSet):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.filterset_fields.remove("qr_code")
+        self.filterset_fields.pop("qr_code")

@@ -196,8 +196,6 @@ ADMIN_USERNAME = getenv("ADMIN_USERNAME", "admin")
 ADMIN_EMAIL = getenv("ADMIN_EMAIL", "admin@admin.admin")
 ADMIN_PASSWORD = getenv("ADMIN_PASSWORD", "admin")
 
-LOG_LEVEL = getenv("LOG_LEVEL", "WARNING")
-DJANGO_LOG_LEVEL = getenv("DJANGO_LOG_LEVEL", "ERROR")
 REQUEST_LOGGING_ENABLED = str_to_bool(getenv("REQUEST_LOGGING_ENABLED", "False"))
 REQUEST_LOGGING_INCLUDE_PATHS = str_to_tuple(
     getenv("REQUEST_LOGGING_INCLUDE_PATHS", "/api")
@@ -205,6 +203,10 @@ REQUEST_LOGGING_INCLUDE_PATHS = str_to_tuple(
 REQUEST_LOGGING_EXCLUDE_PATHS = str_to_tuple(
     getenv("REQUEST_LOGGING_EXCLUDE_PATHS", "/api/schema,/api/docs")
 )
+
+LOG_LEVEL = getenv("LOG_LEVEL", "WARNING")
+DJANGO_LOG_LEVEL = getenv("DJANGO_LOG_LEVEL", "ERROR")
+DJANGO_DB_LOG_LEVEL = getenv("DJANGO_DB_LOG_LEVEL", "ERROR")
 
 LOGGING = {
     "version": 1,
@@ -227,7 +229,7 @@ LOGGING = {
         },
         "django.db.backends": {
             "handlers": ("console",),
-            "level": DJANGO_LOG_LEVEL,
+            "level": DJANGO_DB_LOG_LEVEL,
         },
     },
 }

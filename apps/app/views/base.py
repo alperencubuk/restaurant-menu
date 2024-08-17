@@ -14,12 +14,13 @@ class BaseModelViewSet(ModelViewSet):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        filter_exclude = ("image",)
-        self.filterset_fields = [
-            field.name
-            for field in self.get_queryset().model._meta.get_fields()
-            if field.name not in filter_exclude
-        ]
+        self.filterset_fields = {}
+        for field in self.get_queryset().model._meta.get_fields():
+            if not field.get_internal_type() == "ForeignKey":
+                self.filterset_fields[field.name] = self.get_lookup(
+                    field.get_internal_type()
+                )
+        self.filterset_fields.pop("image")
 
     def get_serializer(self, *args, **kwargs):
         if self.action == "reorder":
@@ -48,3 +49,26 @@ class BaseModelViewSet(ModelViewSet):
             data={"order": queryset.order_by("order").values_list("id", flat=True)},
             status=status.HTTP_200_OK,
         )
+
+    @staticmethod
+    def get_lookup(field_type):
+        if field_type in ("CharField", "TextField"):
+            return [
+                "exact",
+                "iexact",
+                "contains",
+                "icontains",
+                "startswith",
+                "istartswith",
+                "endswith",
+                "iendswith",
+            ]
+        if field_type in (
+            "IntegerField",
+            "FloatField",
+            "DecimalField",
+            "DateTimeField",
+            "BigAutoField",
+        ):
+            return ["exact", "lt", "lte", "gt", "gte"]
+        return ["exact"]
