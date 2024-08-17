@@ -14,26 +14,7 @@ class BaseModelViewSet(ModelViewSet):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.filterset_fields = {}
-        filter_exclude = {"image", "qr_code"}
-
-        model_meta = self.get_queryset().model._meta
-
-        for field in model_meta.get_fields():
-            if field.name in filter_exclude:
-                continue
-
-            if field.get_internal_type() == "ForeignKey":
-                related_model_meta = field.related_model._meta
-                for related_field in related_model_meta.get_fields():
-                    if related_field.name not in filter_exclude:
-                        self.filterset_fields[f"{field.name}__{related_field.name}"] = (
-                            self.get_lookup(related_field.get_internal_type())
-                        )
-            else:
-                self.filterset_fields[field.name] = self.get_lookup(
-                    field.get_internal_type()
-                )
+        self.filterset_fields = self.get_filterset_fields()
 
     def get_serializer(self, *args, **kwargs):
         if self.action == "reorder":
@@ -63,25 +44,36 @@ class BaseModelViewSet(ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
+    def get_filterset_fields(self):
+        filterset_fields = {}
+        filter_exclude = ("image", "qr_code")
+
+        model_meta = self.get_queryset().model._meta
+
+        for field in model_meta.get_fields():
+            if field.name in filter_exclude:
+                continue
+
+            filterset_fields[field.name] = self.get_lookup(field.get_internal_type())
+
+            if field.get_internal_type() in (
+                "ForeignKey",
+                "OneToOneField",
+                "ManyToManyField",
+            ):
+                related_model_meta = field.related_model._meta
+                for related_field in related_model_meta.get_fields():
+                    if related_field.name in ("name", "username"):
+                        filterset_fields[f"{field.name}__{related_field.name}"] = (
+                            self.get_lookup(related_field.get_internal_type())
+                        )
+
+        return filterset_fields
+
     @staticmethod
     def get_lookup(field_type):
         if field_type in ("CharField", "TextField"):
-            return [
-                "exact",
-                "iexact",
-                "contains",
-                "icontains",
-                "startswith",
-                "istartswith",
-                "endswith",
-                "iendswith",
-            ]
-        if field_type in (
-            "IntegerField",
-            "FloatField",
-            "DecimalField",
-            "DateTimeField",
-            "BigAutoField",
-        ):
+            return ["exact", "icontains", "istartswith"]
+        if field_type in ("IntegerField", "DecimalField", "DateTimeField"):
             return ["exact", "lt", "lte", "gt", "gte"]
         return ["exact"]
