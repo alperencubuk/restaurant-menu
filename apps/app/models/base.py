@@ -10,7 +10,7 @@ from django.db.models import (
 
 
 class BaseModel(Model):
-    name = CharField(max_length=255)
+    name = CharField(max_length=255, db_index=True)
     image = TextField(blank=True, default="")
     description = TextField(blank=True, default="")
     is_active = BooleanField(default=True, db_index=True)
