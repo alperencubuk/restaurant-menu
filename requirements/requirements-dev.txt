@@ -1,4 +1,4 @@
 -r requirements.txt
 
-pre-commit<4
-ruff<0.7
+pre-commit<5
+ruff<0.12
