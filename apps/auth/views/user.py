@@ -16,6 +16,7 @@ from apps.auth.serializers.user import (
 
 @extend_schema(tags=["user"])
 class UserViewSet(ModelViewSet):
+    ordering = ("-id",)
     queryset = User.objects.all().prefetch_related("restaurants")
     filterset_class = UserFilter
 
