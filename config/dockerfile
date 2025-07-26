@@ -4,10 +4,11 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONIOENCODING=UTF-8
+    PYTHONIOENCODING=UTF-8 \
+    PIP_NO_CACHE_DIR=1
 
 COPY requirements/requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -U pip uv && uv pip install -r requirements.txt --system
 
 COPY manage.py .
 COPY config config
@@ -18,5 +19,5 @@ RUN python manage.py collectstatic --noinput
 CMD ["sh", "-c", "\
     python manage.py migrate && \
     python manage.py create_admin && \
-    python manage.py runserver 0.0.0.0:8000 \
+    gunicorn config.wsgi --bind 0.0.0.0:8000 --workers 2 \
 "]
