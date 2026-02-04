@@ -31,6 +31,7 @@ class RequestLogMiddleware:
                 "request_body": request_body,
                 "response_body": response_body,
                 "user": str(request.user),
+                "ip": self._get_client_ip(request),
                 "run_time": f"{run_time:.3f} seconds",
             },
             indent=4,
@@ -71,3 +72,12 @@ class RequestLogMiddleware:
             for path in settings.REQUEST_LOGGING_EXCLUDE_PATHS
         )
         return is_included_path and not is_excluded_path
+
+    @staticmethod
+    def _get_client_ip(request):
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        return (
+            x_forwarded_for.split(",")[0].strip()
+            if x_forwarded_for
+            else request.META.get("REMOTE_ADDR")
+        )

@@ -47,26 +47,36 @@ class IsModerator(BasePermission):
     def _get_restaurant_from_request(request):
         relations = {
             "restaurant_id": lambda x: Restaurant.objects.filter(id=x).first(),
-            "menu_id": lambda x: Menu.objects.filter(id=x)
-            .select_related("restaurant")
-            .first()
-            .restaurant,
-            "category_id": lambda x: Category.objects.filter(id=x)
-            .select_related("menu__restaurant")
-            .first()
-            .menu.restaurant,
-            "section_id": lambda x: Section.objects.filter(id=x)
-            .select_related("category__menu__restaurant")
-            .first()
-            .category.menu.restaurant,
-            "item_id": lambda x: Item.objects.filter(id=x)
-            .select_related("section__category__menu__restaurant")
-            .first()
-            .section.category.menu.restaurant,
-            "variation_id": lambda x: Variation.objects.filter(id=x)
-            .select_related("item__section__category__menu__restaurant")
-            .first()
-            .item.section.category.menu.restaurant,
+            "menu_id": lambda x: (
+                Menu.objects.filter(id=x)
+                .select_related("restaurant")
+                .first()
+                .restaurant
+            ),
+            "category_id": lambda x: (
+                Category.objects.filter(id=x)
+                .select_related("menu__restaurant")
+                .first()
+                .menu.restaurant
+            ),
+            "section_id": lambda x: (
+                Section.objects.filter(id=x)
+                .select_related("category__menu__restaurant")
+                .first()
+                .category.menu.restaurant
+            ),
+            "item_id": lambda x: (
+                Item.objects.filter(id=x)
+                .select_related("section__category__menu__restaurant")
+                .first()
+                .section.category.menu.restaurant
+            ),
+            "variation_id": lambda x: (
+                Variation.objects.filter(id=x)
+                .select_related("item__section__category__menu__restaurant")
+                .first()
+                .item.section.category.menu.restaurant
+            ),
         }
 
         data = request.data
